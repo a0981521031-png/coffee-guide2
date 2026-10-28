@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>悠遊卡使用說明書</title>
+<style>
+:root{--bg:#e8eff9;--ink:#14213d;--sub:#51607f;--line:#c3d0e6;--card:#f7f9fd;--brand:#1f5bd8;--brand2:#ffcf33;--brand-ink:#fff;--bad:#b3261e}
+@media (prefers-color-scheme:dark){:root{--bg:#0e1526;--ink:#e6ecf8;--sub:#9aabcc;--line:#243556;--card:#16203a;--brand:#5b8cff;--brand2:#ffcf33;--brand-ink:#0b1020;--bad:#ff8a80}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;line-height:1.75}
+main{max-width:900px;margin:0 auto;padding:0 20px 80px}
+header{padding:60px 0 28px}
+h1{font-size:clamp(2.2rem,7vw,3.6rem);line-height:1.15;margin:0 0 14px;letter-spacing:.03em}
+header p{max-width:34em;color:var(--sub);font-size:1.1rem;margin:0}
+section{margin-top:56px}
+h2{font-size:1.55rem;margin:0 0 6px}
+.lead{color:var(--sub);margin:0 0 20px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px}
+.sim{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}
+@media(max-width:700px){.sim{grid-template-columns:1fr}}
+.ecard{aspect-ratio:1.586;border-radius:18px;background:linear-gradient(135deg,var(--brand),#0f2f75);color:#fff;padding:20px 22px;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 10px 24px rgba(20,33,61,.28);transition:transform .15s}
+.ecard.tap{transform:scale(.96)}
+.ecard .chip{width:42px;height:32px;border-radius:6px;background:var(--brand2)}
+.ecard .name{font-weight:700;font-size:1.1rem}
+.ecard .bal{font-size:2.6rem;font-weight:700;font-variant-numeric:tabular-nums;line-height:1}
+.ecard small{opacity:.8}
+.row{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 16px}
+h3{margin:12px 0 4px;font-size:1.05rem}
+button{font:inherit;cursor:pointer;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:8px 14px}
+button.go{background:var(--brand);color:var(--brand-ink);border-color:var(--brand);font-weight:700}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--brand2);outline-offset:2px}
+#msg{min-height:1.8em;font-weight:700}
+#msg.err{color:var(--bad)}
+#log{margin:8px 0 0;padding:0;list-style:none;max-height:150px;overflow:auto;font-size:.95rem;color:var(--sub)}
+#log li{padding:3px 0;border-bottom:1px solid var(--line);display:flex;justify-content:space-between}
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.tabs button[aria-selected="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.body h3{font-size:1.25rem;margin-top:0}
+.body ul{padding-left:1.2em;margin:6px 0 0}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:560px){.grid{grid-template-columns:1fr}}
+label{display:block;font-size:.95rem;color:var(--sub);margin-bottom:3px}
+input,select{width:100%;font:inherit;padding:8px 10px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink)}
+.res{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:18px;text-align:center}
+.res b{display:block;font-size:1.7rem;font-variant-numeric:tabular-nums}
+.res span{color:var(--sub);font-size:.9rem}
+dt{font-weight:700;margin-top:16px}
+dd{margin:2px 0 0;color:var(--sub)}
+.note{color:var(--sub);font-size:.9rem;margin-top:12px}
+</style>
+</head>
+<body>
+<main>
+<header>
+<h1>悠遊卡<br>使用說明書</h1>
+<p>搭捷運、坐公車、在便利商店付款，一張卡就搞定。先在下面的虛擬卡片上練習一次，再到現實中使用。</p>
+</header>
+
+<section aria-labelledby="s1">
+<h2 id="s1">虛擬悠遊卡練習</h2>
+<p class="lead">先加值，再選擇要搭乘或消費，看餘額怎麼變化。</p>
+<div class="sim">
+<div>
+<div class="ecard" id="ecard" aria-live="polite">
+<div style="display:flex;justify-content:space-between;align-items:center"><span class="name">EasyCard 練習卡</span><span class="chip"></span></div>
+<div><small>目前餘額</small><div class="bal">$<span id="bal">0</span></div></div>
+</div>
+<p id="msg" aria-live="polite">餘額是 0，先加值吧。</p>
+</div>
+<div class="panel">
+<h3>1. 加值</h3>
+<div class="row">
+<button class="go" data-add="100">+100</button>
+<button class="go" data-add="500">+500</button>
+<button class="go" data-add="1000">+1000</button>
+</div>
+<h3>2. 刷卡使用</h3>
+<div class="row">
+<button data-pay="25" data-n="捷運">捷運 $25</button>
+<button data-pay="15" data-n="公車">公車 $15</button>
+<button data-pay="8" data-n="轉乘公車（轉乘優惠）">轉乘公車 $8</button>
+<button data-pay="35" data-n="便利商店咖啡">超商咖啡 $35</button>
+</div>
+<h3>消費紀錄</h3>
+<ul id="log"><li><span>尚無紀錄</span></li></ul>
+<p class="note">這裡的票價是示範用的數字，各縣市與路線的實際票價請以官方公告為準。</p>
+</div>
+</div>
+</section>
+
+<section aria-labelledby="s2">
+<h2 id="s2">五步驟學會使用</h2>
+<p class="lead">點選步驟查看說明。</p>
+<div class="tabs" role="tablist" id="tabs"></div>
+<div class="panel body" id="body" role="tabpanel"></div>
+</section>
+
+<section aria-labelledby="s3">
+<h2 id="s3">每月搭乘費用試算</h2>
+<p class="lead">填入你的票價與搭乘次數，看一個月大概要加值多少。票價請依你實際搭乘的路線自行填寫。</p>
+<div class="panel">
+<div class="grid">
+<div><label for="mode">交通工具</label>
+<select id="mode"><option value="25">捷運（示範 $25）</option><option value="15">公車（示範 $15）</option><option value="30">客運／其他（示範 $30）</option></select></div>
+<div><label for="fare">單程票價（元，可修改）</label><input id="fare" type="number" min="0" value="25"></div>
+<div><label for="wk">每週搭乘天數</label><input id="wk" type="number" min="0" max="7" value="5"></div>
+<div><label for="tr">每天搭乘趟數（來回算 2）</label><input id="tr" type="number" min="0" max="10" value="2"></div>
+<div><label for="dc">折扣或回饋（%，沒有就填 0）</label><input id="dc" type="number" min="0" max="100" value="0"></div>
+</div>
+<div class="res">
+<div><b id="r1">0</b><span>每月花費（元）</span></div>
+<div><b id="r2">0</b><span>每月趟數</span></div>
+<div><b id="r3">0</b><span>建議每次加值（元）</span></div>
+</div>
+<p class="note">以每月 4 週計算。建議加值金額取到整百，方便在便利商店儲值。</p>
+</div>
+</section>
+
+<section aria-labelledby="s4">
+<h2 id="s4">常見問題</h2>
+<dl>
+<dt>餘額不足時會怎樣？</dt><dd>閘門或讀卡機會顯示錯誤聲響，這時需要先加值再使用。</dd>
+<dt>卡片遺失怎麼辦？</dt><dd>記名卡可以向發行單位辦理掛失，沒有記名的卡就比較難找回，建議餘額不要放太多。</dd>
+<dt>可以一次刷兩張卡嗎？</dt><dd>不行，兩張卡靠得太近會讀取失敗，請單獨拿出要使用的那一張。</dd>
+<dt>怎麼查餘額？</dt><dd>搭乘後讀卡機螢幕會顯示，也可以用加值機、便利商店或手機 App 查詢。</dd>
+</dl>
+</section>
+</main>
+
+<script>
+const $=id=>document.getElementById(id);
+let bal=0;
+function say(t,err){const m=$('msg');m.textContent=t;m.className=err?'err':''}
+function tap(){const c=$('ecard');c.classList.add('tap');setTimeout(()=>c.classList.remove('tap'),150)}
+function addLog(name,amt,plus){
+ const ul=$('log');if(ul.children.length===1&&ul.firstChild.textContent==='尚無紀錄')ul.innerHTML='';
+ const li=document.createElement('li');
+ li.innerHTML='<span></span><b></b>';li.children[0].textContent=name;li.children[1].textContent=(plus?'+':'-')+amt;
+ ul.prepend(li);
+}
+document.querySelectorAll('[data-add]').forEach(b=>b.onclick=()=>{
+ const a=+b.dataset.add;
+ if(bal+a>10000){say('超過餘額上限，這次不能加值。',true);return}
+ bal+=a;$('bal').textContent=bal;tap();say('加值成功：+'+a,false);addLog('加值',a,true);
+});
+document.querySelectorAll('[data-pay]').forEach(b=>b.onclick=()=>{
+ const p=+b.dataset.pay;
+ if(bal<p){say('餘額不足，請先加值。',true);return}
+ bal-=p;$('bal').textContent=bal;tap();say('嗶！'+b.dataset.n+'，扣款 '+p+' 元。',false);addLog(b.dataset.n,p,false);
+});
+
+const steps=[
+{t:"1. 取得卡片",b:"<ul><li>可在捷運站服務台、便利商店等處購買。</li><li>價格與是否含儲值金，請以購買地點的公告為準。</li><li>也可以選擇手機綁定的行動版悠遊卡。</li></ul>"},
+{t:"2. 加值",b:"<ul><li>便利商店櫃台：告訴店員要加值多少，現金付款。</li><li>捷運站加值機：放上卡片，投入現金。</li><li>手機 App：用信用卡或行動支付加值。</li><li>卡片有餘額上限，加值前先確認。</li></ul>"},
+{t:"3. 搭乘",b:"<ul><li>捷運：進站與出站各刷一次。</li><li>公車：看司機公告是「上車刷」還是「下車刷」，若兩次都要刷，別忘記。</li><li>刷卡時把卡片平放在感應區，聽到聲音再離開。</li></ul>"},
+{t:"4. 消費",b:"<p>在便利商店、販賣機與部分商家，結帳時說「悠遊卡付款」，把卡片放到感應機上。</p>"},
+{t:"5. 查餘額與退卡",b:"<ul><li>餘額可在讀卡機或 App 查詢。</li><li>不再使用時，可到指定服務據點辦理退卡與退費，細節請洽發行單位。</li></ul>"}
+];
+const tabs=$('tabs');
+steps.forEach((s,i)=>{const b=document.createElement('button');b.role='tab';b.textContent=s.t;b.onclick=()=>show(i);tabs.appendChild(b)});
+function show(i){[...tabs.children].forEach((b,j)=>b.setAttribute('aria-selected',i===j));$('body').innerHTML='<h3>'+steps[i].t+'</h3>'+steps[i].b}
+show(0);
+
+$('mode').onchange=()=>{$('fare').value=$('mode').value;calc()};
+['fare','wk','tr','dc'].forEach(id=>$(id).oninput=calc);
+function calc(){
+ const f=+$('fare').value||0,w=+$('wk').value||0,t=+$('tr').value||0,d=+$('dc').value||0;
+ const trips=w*t*4,cost=Math.round(trips*f*(1-d/100));
+ $('r1').textContent=cost;$('r2').textContent=trips;
+ $('r3').textContent=cost?Math.ceil(cost/100)*100:0;
+}
+calc();
+</script>
+</body>
+</html>
